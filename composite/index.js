@@ -15,36 +15,64 @@ const main = async () => {
     const inactiveDateInput = core.getInput('inactive-timeout');
 
     const dateNow = new Date();
-    const staleDate = subtractDurationFromDate(dateNow, staleDateInput);
-    const inactiveDate = subtractDurationFromDate(dateNow, inactiveDateInput);
+    const staleDate = subtractDurationFromDate(dateNow, staleDateInput, 'stale-timeout');
+    const inactiveDate = subtractDurationFromDate(dateNow, inactiveDateInput, 'inactive-timeout');
 
     const notFoundEmoji = core.getInput('not-found-emoji');
     const inactiveEmoji = core.getInput('inactive-emoji');
     const staleEmoji = core.getInput('stale-emoji');
     const activeEmoji = core.getInput('active-emoji');
 
-
     // Example matches:
-    //                      owner   repo
-    //                        |      |
-    //                    --------- ---- 
-    // https://github.com/rust-lang/rust <!-- STATUS_BADGE -->
+    //                      owner   repo     emoji
+    //                        |      |         |
+    //                    --------- ---- --------------
+    // https://github.com/rust-lang/rust :green_circle: <!-- STATUS_BADGE -->
     // --------------------------------- 
     //                 |
-    //                url
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH 1
+    //                baseUrl
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH
     //
-    //                             owner   repo      emoji
-    //                               |      |          |
-    //                           --------- ----  --------------
-    // [Repo](https://github.com/rust-lang/rust) :green_circle: <!-- STATUS_BADGE -->
-    //        ---------------------------------| 
-    //                        |             bracket
-    //                       url
-    //        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH 2
-    const urlRegex = /(?<url>https?:\/\/github\.com\/(?<owner>[\w,\-,\.]+)\/(?<repo>[\w,\-,\.]+)\/?) *(?<bracket>\))? *(?<emoji>\:\w+\:)? *(?=<!\-\- *STATUS_BADGE *\-\->)/g;
+    //
+    //                             owner   repo
+    //                               |      |
+    //                           --------- ----
+    // [Repo](https://github.com/rust-lang/rust/blob/master/README.md#quick-start) <!-- STATUS_BADGE -->
+    //        ---------------------------------
+    //                        |                ----------------------------------- tail
+    //                      baseUrl
+    //        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH
+    //
+    const badgeRegex   = /(?<baseUrl>https?:\/\/github\.com\/(?<owner>[\w,\-,\.]+)\/(?<repo>[\w,\-,\.]+))(?<tail>(?:[\/,#][\w,\-,\.,\/,\#]*)?\)?)? *(?<emoji>\:\w+\:)? *(?=<!\-\- *STATUS_BADGE *\-\->)/g;
+    
+    //                      owner   repo                                            badge
+    //                        |      |                                                |
+    //                    --------- ----                                   ------------------------
+    // https://github.com/rust-lang/rust/blob/master/README.md#quick-start <!-- NO_STATUS_BADGE -->
+    // ---------------------------------
+    //                 |                ---------------------------------- tail
+    //                url
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH 
+    //
+    const findAllRegex = /(?<baseUrl>https?:\/\/github\.com\/(?<owner>[\w,\-,\.]+)\/(?<repo>[\w,\-,\.]+))(?<tail>(?:[\/,#][\w,\-,\.,\/,\#]*)?\)?)? *(?<emoji>\:\w+\:)? *(?<badge><!\-\- *NO_STATUS_BADGE *\-\->)?/g;
 
-    const updatedContent = await replaceAsync(content, urlRegex, async (_match, url, owner, repo, bracket, _emoji) => {
+    let regex;
+    const findAllLinks = core.getInput('find-all-links');
+    if (findAllLinks === 'true') {
+        regex = findAllRegex;
+    } else if (findAllLinks === 'false') {
+        regex = badgeRegex;
+    } else {
+        throw Error("Paremeter `find-all-links` must set to `true` or `false`")
+    }
+
+    const updatedContent = await replaceAsync(content, regex, async (match, baseUrl, owner, repo, tail, _emoji, badge) => {
+        // Don't replace anything with matches that have the `<-- NO_STATUS_BADGE -->` tag in findAll mode
+        if (badge && findAllLinks === 'true') {
+            core.debug(`Ignoring match: "${match}"`);
+            return match
+        }
+
         let emoji = notFoundEmoji;
         try {
             const lastCommitDate = await getLastCommitDate(octokit, owner, repo);
@@ -61,8 +89,8 @@ const main = async () => {
             core.warning(`Error getting last commit date for repo https://github.com/${owner}/${repo}: ${err}`);
         }
 
-        core.debug(`Found repo: ${url}, setting status to ${emoji}`)
-        return `${url}${bracket ? `${bracket}` : ""} ${emoji} `;
+        core.debug(`Found repo: ${baseUrl}, setting status to ${emoji}`)
+        return `${baseUrl}${tail ? `${tail}` : ""} ${emoji} `;
     });
 
     core.debug("\n---- OLD TEXT ----\n");

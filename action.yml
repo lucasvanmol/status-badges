@@ -34,11 +34,15 @@ inputs:
     description: 'The amount of time before a repo is considered inactive'
     default: '3 months'
     required: false
+  find-all-links:
+    description: 'If true, set badges next to every repo link in the file, regardless of `<!-- STATUS_BADGE -->` being present'
+    default: false
+    required: false
 
 runs:
   using: 'composite'
   steps: 
-    - uses: lucasvanmol/status-badges/composite@v1.1
+    - uses: lucasvanmol/status-badges/composite@v1
       id: parse
       with:
         path: ${{ inputs.path }}
@@ -48,7 +52,8 @@ runs:
         inactive-emoji: ${{ inputs.inactive-emoji }} 
         not-found-emoji: ${{ inputs.not-found-emoji }} 
         stale-timeout: ${{ inputs.stale-timeout }} 
-        inactive-timeout: ${{ inputs.inactive-timeout }} 
+        inactive-timeout: ${{ inputs.inactive-timeout }}
+        find-all-links: ${{ inputs.find-all-links }}
     - run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"

@@ -18,15 +18,16 @@ export async function getLastCommitDate(octokit, owner, repo) {
  * Given a date and a string in the form "x day/week/month/year(s)", subtract that duration from the date
  * @param   {Date}      originDate      Date to start with
  * @param   {string}    durationString  Number of days/weeks/months/years to substract. Must be a string that matches `/^(\d+) (day|week|month|year)s?$/`
+ * @param   {string}    parameterName   The name of the parameter, for debug logging
  * @returns {Date}                      The originDate minus the duration specified by durationString
  */
-export function subtractDurationFromDate(originDate, durationString) {
+export function subtractDurationFromDate(originDate, durationString, parameterName = undefined) {
     const regex = /^(\d+) (day|week|month|year)s?$/;
     const newDate = new Date(originDate.getTime());
 
     let match = durationString.match(regex);
     if (!match) {
-        throw Error(`The parameter "${durationString}" should match ${regex}`)
+        throw Error(`${parameterName ? `The parameter ${parameterName}, which was set to ` : ""}'${durationString}' should match ${regex}`)
     } else {
         switch (match[2]) {
             case 'day':

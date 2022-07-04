@@ -25,6 +25,9 @@ inputs:
   inactive-timeout:
     description: 'The amount of time before a repo is considered inactive'
     required: true
+  find-all-links:
+    description: 'If true, set badges next to every repo link in the file, regardless of `<!-- STATUS_BADGE -->` being present'
+    required: true
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -48,7 +48,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Check and update badges
-        uses: lucasvanmol/status-badges@v1.1
+        uses: lucasvanmol/status-badges@v1
         with:
           path: 'README.md'
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -60,6 +60,7 @@ Certain inputs are optional arguments to customize emojis to use and determine f
 
 | Input | Description | Default | 
 |-------|-------------|---------|
+| `find-all-links` | If `true`, set badges next to every repo link in the file, regardless of `<!-- STATUS_BADGE -->` being present' | `false` |
 | `stale-timeout` | The amount of time required before a repo is marked as stale. Must match `/^(\d+) (day\|week\|month\|year)s?$/`. | `1 month` |
 | `inactive-timeout` | The amount of time required before a repo is marked as inactive. Must match `/^(\d+) (day\|week\|month\|year)s?$/`. | `3 months` |
 | `active-emoji` | The emoji to use for active repos. | :green_circle: |
@@ -76,3 +77,7 @@ Certain inputs are optional arguments to customize emojis to use and determine f
 | `https://github.com/rust-lang/rus​t <!-- STATUS_BADGE -->` | https://github.com/rust-lang/rust :green_circle: <!-- STATUS_BADGE --> |
 | `[Inactive Repo](https://github.com/lucasvanmol/barnes-hut-benc​h) <!-- STATUS_BADGE -->` | [Inactive Repo](https://github.com/lucasvanmol/barnes-hut-bench) :red_circle: <!-- STATUS_BADGE --> |
 | `https://github.com/lucasvanmol/this-repo-does-not-exis​t <!-- STATUS_BADGE -->` | https://github.com/lucasvanmol/this-repo-does-not-exist :grey_question: <!-- STATUS_BADGE --> |
+| `[Rust's test directory](h​ttps://github.com/rust-lang/rust/tree/master/src/test) <!-- STATUS_BADGE -->`  | [Rust's test directory](https://github.com/rust-lang/rust/tree/master/src/test) <!-- STATUS_BADGE --> |
+| h​ttps://github.com/rust-lang/rust#building-on-windows <!-- STATUS_BADGE --> | https://github.com/rust-lang/rust#building-on-windows <!-- STATUS_BADGE --> |
+
+Note that only the main branch is checked for commits. For links to subdirectories, only the base directory is checked.
