@@ -1,12 +1,12 @@
 # Development
 
-## Testing
-
-### Install dependencies
+Before testing/building, install node dependencies with
 
 ```
 npm install
 ```
+
+## Testing
 
 ### Run tests
 
@@ -26,16 +26,8 @@ Note that requests to the github API are not mocked (yet?), so an internet conne
 
 ## Building
 
-First install ncc
-
-```
-npm i -g @vercel/ncc
-```
-
-Then build with
-
 ```
 npm run build
 ```
 
-which will compile all the code and modules into `dist/index.js`
+which will compile all the code, modules and licences into `dist/...`

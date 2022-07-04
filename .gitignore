@@ -1,3 +1,5 @@
-.env
+composite/.env
 
-node_modules
+composite/node_modules
+
+composite/coverage
