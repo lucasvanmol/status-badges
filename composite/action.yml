@@ -1,0 +1,30 @@
+name: 'Status Badge (Composite)'
+description: 'Composite action that parses files, gets commit history, and updates the status badges of the file locally (does not push changes)'
+inputs:
+  path:
+    description: 'File to parse & set status badges on'
+    required: true
+  token:
+    description: 'Your GITHUB_TOKEN'
+    required: true
+  active-emoji:
+    description: 'The emoji to use for active repos'
+    required: true
+  stale-emoji:
+    description: 'The emoji to use for stale repos'
+    required: true
+  inactive-emoji:
+    description: 'The emoji to use for inactive repos'
+    required: true
+  not-found-emoji:
+    description: 'The emoji to use for repos that were not found'
+    required: true
+  stale-timeout:
+    description: 'The amount of time before a repo is considered stale'
+    required: true
+  inactive-timeout:
+    description: 'The amount of time before a repo is considered inactive'
+    required: true
+runs:
+  using: 'node16'
+  main: 'index.js'

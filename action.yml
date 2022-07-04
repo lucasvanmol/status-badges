@@ -1,0 +1,58 @@
+name: 'Status Badge'
+description: 'Places an emoji next to github links hinting at the date of the last commit'
+inputs:
+  path:
+    description: 'File to parse & set status badges on'
+    required: true
+  token:
+    description: 'Your GITHUB_TOKEN'
+    required: true
+  active-emoji:
+    description: 'The emoji to use for active repos'
+    default: ':green_circle:'
+    required: false
+  stale-emoji:
+    description: 'The emoji to use for stale repos'
+    default: ':yellow_circle:'
+    required: false
+  inactive-emoji:
+    description: 'The emoji to use for inactive repos'
+    default: ':red_circle:'
+    required: false
+  not-found-emoji:
+    description: 'The emoji to use for repos that were not found'
+    default: ':grey_question:'
+    required: false
+  stale-timeout:
+    description: 'The amount of time before a repo is considered stale'
+    default: '1 month'
+    required: false
+  inactive-timeout:
+    description: 'The amount of time before a repo is considered inactive'
+    default: '3 months'
+    required: false
+
+runs:
+  using: 'composite'
+  steps: 
+    - uses: ./composite
+      id: parse
+      with:
+        path: ${{ inputs.path }}
+        token: ${{ inputs.token }}
+        active-emoji: ${{ inputs.active-emoji }} 
+        stale-emoji: ${{ inputs.stale-emoji }} 
+        inactive-emoji: ${{ inputs.inactive-emoji }} 
+        not-found-emoji: ${{ inputs.not-found-emoji }} 
+        stale-timeout: ${{ inputs.stale-timeout }} 
+        inactive-timeout: ${{ inputs.inactive-timeout }} 
+    - run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add --all
+        if ! git diff-index --quiet HEAD; then
+          git commit -am "Update status badges"
+          git pull --rebase
+          git push
+        fi
+      shell: bash
