@@ -1,11 +1,12 @@
 {
   "name": "maintained-badge-action",
-  "version": "1.0.0",
+  "version": "1.1",
   "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "build": "ncc build index.js --license licenses.txt -m"
   },
   "keywords": [],
   "author": "",
