@@ -1,5 +1,8 @@
 name: 'Status Badge'
 description: 'Places an emoji next to github links hinting at the date of the last commit'
+branding:
+  icon: 'check-circle'
+  color: 'green'
 inputs:
   path:
     description: 'File to parse & set status badges on'
