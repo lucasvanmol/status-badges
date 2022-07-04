@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "build": "ncc build index.js --license licenses.txt -m"
+    "build": "ncc build index.js --license licenses.txt"
   },
   "keywords": [],
   "author": "",
