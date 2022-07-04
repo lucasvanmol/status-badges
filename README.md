@@ -48,7 +48,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Check and update badges
-        uses: lucasvanmol/status-badge-action@v1
+        uses: lucasvanmol/status-badge-action@v1.1
         with:
           path: 'README.md'
           token: ${{ secrets.GITHUB_TOKEN }}
