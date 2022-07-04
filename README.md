@@ -31,7 +31,7 @@ Example workflow file that updates status badges every 24 hours found inside `RE
 Note that the `actions/checkout` step is required. 
 
 ```yaml
-name: update-status-badges
+name: Update Status Badges
 on:
   schedule:
     - cron: '0 0 * * *'
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Check and update badges
-        uses: lucasvanmol/status-badge-action@v1.1
+        uses: lucasvanmol/status-badges@v1.1
         with:
           path: 'README.md'
           token: ${{ secrets.GITHUB_TOKEN }}

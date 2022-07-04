@@ -1,4 +1,4 @@
-name: update-status-badges
+name: Update Status Badges
 on:
   schedule:
     - cron: '0 0 * * *'

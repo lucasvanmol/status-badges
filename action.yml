@@ -38,7 +38,7 @@ inputs:
 runs:
   using: 'composite'
   steps: 
-    - uses: ./composite
+    - uses: lucasvanmol/status-badges/composite@v1.1
       id: parse
       with:
         path: ${{ inputs.path }}
