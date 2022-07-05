@@ -3,6 +3,7 @@ import github from "@actions/github";
 import replaceAsync from "string-replace-async";
 import { promises as fs } from "fs";
 import { getLastCommitDate, subtractDurationFromDate } from "./modules/mod.js";
+import { simpleGit } from "simple-git";
 
 const main = async () => {
     const myToken = core.getInput('token');
@@ -63,7 +64,7 @@ const main = async () => {
     } else if (findAllLinks === 'false') {
         regex = badgeRegex;
     } else {
-        throw Error("Paremeter `find-all-links` must set to `true` or `false`")
+        throw Error("Parameter `find-all-links` must set to `true` or `false`")
     }
 
     const updatedContent = await replaceAsync(content, regex, async (match, baseUrl, owner, repo, tail, _emoji, badge) => {
@@ -98,7 +99,17 @@ const main = async () => {
     core.debug("\n---- NEW TEXT ----\n");
     core.debug(updatedContent);
 
-    await fs.writeFile(path, updatedContent);
+    if (content !== updatedContent) {
+        await fs.writeFile(path, updatedContent);
+        
+        const git = simpleGit()
+            .addConfig('user.name', 'github-actions[bot]')
+            .addConfig('user.email', 'github-actions[bot]@users.noreply.github.com')
+            .commit("Update status badges", path);
+        
+        await git.pull(undefined, undefined, {'--rebase': 'true'});
+        await git.push();
+    }
 }
 
 main().catch(err => core.setFailed(err.message));
