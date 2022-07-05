@@ -1,4 +1,4 @@
-name: 'Status Badge'
+name: 'Status Badges'
 description: 'Places an emoji next to github links hinting at the date of the last commit'
 branding:
   icon: 'check-circle'
