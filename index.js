@@ -8,6 +8,7 @@ import { simpleGit } from "simple-git";
 const main = async () => {
     const myToken = core.getInput('token');
     const octokit = github.getOctokit(myToken);
+    const context = github.context;
 
     const path = core.getInput('path');
     const content = await fs.readFile(path, 'utf8');
@@ -99,16 +100,45 @@ const main = async () => {
     core.debug("\n---- NEW TEXT ----\n");
     core.debug(updatedContent);
 
-    if (content !== updatedContent) {
-        await fs.writeFile(path, updatedContent);
-        
+    const doPullRequest = core.getInput('pull-request') === 'true';
+
+    if (content !== updatedContent) {        
+        // Setup git
         const git = simpleGit()
-            .addConfig('user.name', 'github-actions[bot]')
-            .addConfig('user.email', 'github-actions[bot]@users.noreply.github.com')
-            .commit("Update status badges", path);
+        git.addConfig('user.name', 'github-actions[bot]')
+            .addConfig('user.email', 'github-actions[bot]@users.noreply.github.com');
         
-        await git.pull(undefined, undefined, {'--rebase': 'true'});
-        await git.push();
+        const base = (await git.branchLocal()).current;
+
+        if (doPullRequest) {
+            // Push to user-specified branch
+            const head = core.getInput('pr-branch');
+            await git.fetch();
+            await git.checkout(head)
+
+            // Update the file content locally & commit to pr-branch
+            await git.reset('hard', `origin/${base}`); //UNTESTED HALP
+            await fs.writeFile(path, updatedContent);
+            git.commit("Update status badges", path);
+            await git.push('origin', head);
+
+            // https://github.com/lucasvanmol/status-badges/pull/4/files
+            await octokit.rest.pulls.create({
+                ...context.repo,
+                head,
+                base,
+                title: "Update status badges"
+            });
+        } else {
+            // Update the file content locally & commit directly to main branch
+            await fs.writeFile(path, updatedContent);
+            git.commit("Update status badges", path);
+
+            await git.pull(undefined, undefined, ['--rebase']);
+            await git.push('origin', base);
+        }
+    } else {
+        core.info("All badges were found to be up-to-date");
     }
 }
 
