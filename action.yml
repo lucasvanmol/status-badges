@@ -38,6 +38,14 @@ inputs:
     description: 'If true, set badges next to every repo link in the file, regardless of `<!-- STATUS_BADGE -->` being present'
     default: false
     required: false
+  pull-request:
+    description: 'If true, create a pull request to make changes instead of committing directly to the branch'
+    default: false
+    required: true
+  pr-branch:
+    description: 'If pull-request is true, this specifies which branch should be the head'
+    default: ''
+    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'

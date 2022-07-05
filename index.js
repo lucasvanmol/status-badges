@@ -8,6 +8,7 @@ import { simpleGit } from "simple-git";
 const main = async () => {
     const myToken = core.getInput('token');
     const octokit = github.getOctokit(myToken);
+    const context = github.context;
 
     const path = core.getInput('path');
     const content = await fs.readFile(path, 'utf8');
@@ -99,16 +100,42 @@ const main = async () => {
     core.debug("\n---- NEW TEXT ----\n");
     core.debug(updatedContent);
 
+    const doPullRequest = core.getInput('pull-request') === 'true';
+
     if (content !== updatedContent) {
+        // Update the file content locally
         await fs.writeFile(path, updatedContent);
         
+        // Commit changes
         const git = simpleGit()
-            .addConfig('user.name', 'github-actions[bot]')
-            .addConfig('user.email', 'github-actions[bot]@users.noreply.github.com')
-            .commit("Update status badges", path);
+        git.addConfig('user.name', 'github-actions[bot]')
+            .addConfig('user.email', 'github-actions[bot]@users.noreply.github.com');
         
-        await git.pull(undefined, undefined, {'--rebase': 'true'});
-        await git.push();
+        const base = (await git.branchLocal()).current;
+
+        if (doPullRequest) {
+            // Push to user-specified branch
+            const head = core.getInput('pr-branch');
+            await git.checkout(head)
+            git.commit("Update status badges", path);
+
+            await git.pull(undefined, undefined, {'--rebase': 'true'});
+            await git.push('origin', head);
+
+            await octokit.rest.pulls.create({
+                ...context.repo,
+                head,
+                base,
+            });
+        } else {
+            // Commit directly to main branch
+            git.commit("Update status badges", path);
+
+            await git.pull(undefined, undefined, {'--rebase': 'true'});
+            await git.push('origin', base);
+        }
+    } else {
+        core.info("All badges were found to be up-to-date");
     }
 }
 
