@@ -151,4 +151,28 @@ export default function setup(globalConfig, projectConfig) {
       },
     ])
     .persist();
+  
+    nock("https://api.github.com")
+    .get("/repos/test-owner/unexistant-repo/commits")
+    .query(params)
+    .reply(404)
+    .persist();
+
+  nock("https://api.github.com")
+    .get("/repos/test-owner/ratelimit-repo/commits")
+    .query(params)
+    .reply(
+      403,
+      {
+        message:
+          "API rate limit exceeded for xxx.xxx.xxx.xxx. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)",
+        documentation_url:
+          "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting",
+      },
+      {
+        "x-ratelimit-limit": 1000,
+        "x-ratelimit-remaining": 0,
+        "x-ratelimit-reset": 1372700873,
+      }
+    ).persist();
 }

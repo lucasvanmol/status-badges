@@ -10436,9 +10436,22 @@ async function findAndPlaceBadges(
           emoji = config.activeEmoji;
         }
       } catch (err) {
-        core.warning(
-          `Error getting last commit date for repo https://github.com/${owner}/${repo}: ${err}`
-        );
+        console.log(err);
+        if (err.status === 404) {
+          core.warning(
+            `Could not find repo https://github.com/${owner}/${repo}: ${err}`
+          );
+        } else if (err.status === 403 && err.message.includes("rate limit")) {
+          const ratelimitRestSeconds = parseInt(
+            err.request.headers["x-ratelimit-reset"]
+          );
+          const ratelimitReset = new Date(ratelimitRestSeconds * 1000);
+          throw Error(
+            `Rate limit error: ${err}. Your rate limit will reset on ${ratelimitReset}`
+          );
+        } else {
+          throw err;
+        }
       }
 
       core.debug(`Found repo: ${baseUrl}, setting status to ${emoji}`);
