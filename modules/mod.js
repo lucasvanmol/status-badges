@@ -14,8 +14,6 @@ export async function getLastCommitDate(octokit, owner, repo) {
     repo,
     per_page: 1,
   });
-  console.log(req);
-  console.log(req.data);
   return new Date(req.data[0].commit.committer.date);
 }
 
