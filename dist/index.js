@@ -14393,7 +14393,7 @@ const main = async () => {
       core.debug(`Creating new branch "${head}"`);
       await git.branch([head]).checkout(head);
 
-      core.debug(`Updating file locally & committing`);
+      core.debug(`Updating file locally & committing to ${head}`);
       await external_fs_.promises.writeFile(path, updatedContent);
       await git.commit("Update status badges", path);
 
@@ -14408,7 +14408,7 @@ const main = async () => {
         title: "Update status badges",
       });
     } else {
-      // Update the file content locally & commit directly to main branch
+      core.debug("Updating file locally & committing to the main branch");
       await external_fs_.promises.writeFile(path, updatedContent);
       await git
         .commit("Update status badges", path)
