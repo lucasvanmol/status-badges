@@ -16,7 +16,7 @@ First setup a github PAT with read permissions and add it to `.env`:
 GITHUB_AUTH_TOKEN=ghp_abc123abc123abc123 > .env
 ```
 
-Then run tests with 
+Then run tests with
 
 ```
 npm run test

@@ -1,10 +1,10 @@
 name: Update Status Badges
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   push:
     paths:
-      - 'README.md'
+      - "README.md"
   workflow_dispatch:
 
 jobs:
@@ -15,8 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Check and update badges
-        uses: lucasvanmol/status-badges@v1
+        uses: lucasvanmol/status-badges@main
         with:
-          path: 'README.md'
+          path: "README.md"
           token: ${{ secrets.GITHUB_TOKEN }}
-          stale-timeout: '1 week'
+          stale-timeout: "1 week"
+          pull-request: true
+          pr-branch: test-branch
