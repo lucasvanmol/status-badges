@@ -59,7 +59,7 @@ Certain inputs are optional arguments to customize emojis to use and determine f
 | ------------------ | ------------------------------------------------------------------------------------------------------------------- | ---------------------- |
 | `find-all-links`   | If `true`, set badges next to every repo link in the file, regardless of `<!-- STATUS_BADGE -->` being present'     | `false`                |
 | `pull-request`     | If `true`, a pull request will be made instead of directly committing to branch.                                    | `false`                |
-| `pr-branch`        | Specify what branch name to use for the pull request head if `pull-request` is `true`                               | `status-badges:update` |
+| `pr-branch`        | Specify what branch name to use for the pull request head if `pull-request` is `true`                               | `status-badges/update` |
 | `stale-timeout`    | The amount of time required before a repo is marked as stale. Must match `/^(\d+) (day\|week\|month\|year)s?$/`.    | `1 month`              |
 | `inactive-timeout` | The amount of time required before a repo is marked as inactive. Must match `/^(\d+) (day\|week\|month\|year)s?$/`. | `3 months`             |
 | `active-emoji`     | The emoji to use for active repos.                                                                                  | :green_circle:         |
