@@ -76,7 +76,7 @@ const main = async () => {
       await git.commit("Update status badges", path);
 
       core.debug(`Running "git push --set-upstream origin ${head}"`);
-      await git.raw(`push --set-upstream origin ${head}`);
+      await git.push(["--set-upstream", "origin", `${head}`]);
 
       core.debug(`Creating pull request`);
       await octokit.rest.pulls.create({
