@@ -6,7 +6,12 @@
   "type": "module",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-    "build": "ncc build index.js --license licenses.txt"
+    "build": "ncc build index.js --license licenses.txt",
+    "lint": "prettier --write .",
+    "check-lint": "prettier --check ."
+  },
+  "jest": {
+    "globalSetup": "<rootDir>/modules/setup-jest.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +25,8 @@
   "devDependencies": {
     "@vercel/ncc": "^0.34.0",
     "dotenv": "^16.0.1",
-    "jest": "^28.1.1"
+    "jest": "^28.1.1",
+    "nock": "^13.2.8",
+    "prettier": "2.7.1"
   }
 }

@@ -1,51 +1,51 @@
-name: 'Status Badges'
-description: 'Places an emoji next to github links hinting at the date of the last commit'
+name: "Status Badges"
+description: "Places an emoji next to github links hinting at the date of the last commit"
 branding:
-  icon: 'check-circle'
-  color: 'green'
+  icon: "check-circle"
+  color: "green"
 inputs:
   path:
-    description: 'File to parse & set status badges on'
+    description: "File to parse & set status badges on"
     required: true
   token:
-    description: 'Your GITHUB_TOKEN'
+    description: "Your GITHUB_TOKEN"
     required: true
   active-emoji:
-    description: 'The emoji to use for active repos'
-    default: ':green_circle:'
+    description: "The emoji to use for active repos"
+    default: ":green_circle:"
     required: false
   stale-emoji:
-    description: 'The emoji to use for stale repos'
-    default: ':yellow_circle:'
+    description: "The emoji to use for stale repos"
+    default: ":yellow_circle:"
     required: false
   inactive-emoji:
-    description: 'The emoji to use for inactive repos'
-    default: ':red_circle:'
+    description: "The emoji to use for inactive repos"
+    default: ":red_circle:"
     required: false
   not-found-emoji:
-    description: 'The emoji to use for repos that were not found'
-    default: ':grey_question:'
+    description: "The emoji to use for repos that were not found"
+    default: ":grey_question:"
     required: false
   stale-timeout:
-    description: 'The amount of time before a repo is considered stale'
-    default: '1 month'
+    description: "The amount of time before a repo is considered stale"
+    default: "1 month"
     required: false
   inactive-timeout:
-    description: 'The amount of time before a repo is considered inactive'
-    default: '3 months'
+    description: "The amount of time before a repo is considered inactive"
+    default: "3 months"
     required: false
   find-all-links:
-    description: 'If true, set badges next to every repo link in the file, regardless of `<!-- STATUS_BADGE -->` being present'
+    description: "If true, set badges next to every repo link in the file, regardless of `<!-- STATUS_BADGE -->` being present"
     default: false
     required: false
   pull-request:
-    description: 'If true, create a pull request to make changes instead of committing directly to the branch'
+    description: "If true, create a pull request to make changes instead of committing directly to the branch"
     default: false
     required: true
   pr-branch:
-    description: 'If pull-request is true, this specifies which branch should be the head'
-    default: ''
+    description: "If pull-request is true, this specifies which branch should be the head"
+    default: ""
     required: false
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node16"
+  main: "dist/index.js"
