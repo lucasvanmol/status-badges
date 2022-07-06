@@ -71,10 +71,10 @@ Certain inputs are optional arguments to customize emojis to use and determine f
 
 | Markdown                                                                                                 | Result                                                                                                               |
 | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `https://github.com/rust-lang/rus​t <!-- STATUS_BADGE -->`                                               | https://github.com/rust-lang/rust <!-- STATUS_BADGE -->                                                              |
-| `[Inactive Repo](https://github.com/lucasvanmol/barnes-hut-benc​h) <!-- STATUS_BADGE -->`                | [Inactive Repo](https://github.com/lucasvanmol/barnes-hut-bench) <!-- STATUS_BADGE -->                               |
-| `https://github.com/lucasvanmol/this-repo-does-not-exis​t <!-- STATUS_BADGE -->`                         | https://github.com/lucasvanmol/this-repo-does-not-exist <!-- STATUS_BADGE -->                                        |
+| `https://github.com/rust-lang/rus​t <!-- STATUS_BADGE -->`                                               | https://github.com/rust-lang/rust :green_circle: <!-- STATUS_BADGE -->                                                              |
+| `[Inactive Repo](https://github.com/lucasvanmol/barnes-hut-benc​h) <!-- STATUS_BADGE -->`                | [Inactive Repo](https://github.com/lucasvanmol/barnes-hut-bench) :red_circle: <!-- STATUS_BADGE -->                               |
+| `https://github.com/lucasvanmol/this-repo-does-not-exis​t <!-- STATUS_BADGE -->`                         | https://github.com/lucasvanmol/this-repo-does-not-exist :grey_question: <!-- STATUS_BADGE -->                                        |
 | `[Rust's test directory](h​ttps://github.com/rust-lang/rust/tree/master/src/test) <!-- STATUS_BADGE -->` | [Rust's test directory](https://github.com/rust-lang/rust/tree/master/src/test) :green_circle: <!-- STATUS_BADGE --> |
-| h​ttps://github.com/rust-lang/rust#building-on-windows <!-- STATUS_BADGE -->                             | https://github.com/rust-lang/rust#building-on-windows :red_circle: <!-- STATUS_BADGE -->                             |
+| h​ttps://github.com/rust-lang/rust#building-on-windows <!-- STATUS_BADGE -->                             | https://github.com/rust-lang/rust#building-on-windows :green_circle: <!-- STATUS_BADGE -->                             |
 
 Note that only the main branch is checked for commits. For links to subdirectories, only the base directory is checked.
