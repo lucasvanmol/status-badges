@@ -14391,7 +14391,7 @@ const main = async () => {
       // Push to user-specified branch
       const head = core.getInput("pr-branch");
       core.debug(`Creating new branch "${head}"`);
-      await git.branch(head).checkout(head);
+      await git.branch([head]).checkout(head);
 
       core.debug(`Updating file locally & committing`);
       await external_fs_.promises.writeFile(path, updatedContent);
