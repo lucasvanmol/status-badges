@@ -79,12 +79,23 @@ const main = async () => {
       await git.push(["-f", "--set-upstream", "origin", `${head}`]);
 
       core.debug(`Creating pull request`);
-      await octokit.rest.pulls.create({
-        ...context.repo,
-        head,
-        base,
-        title: "Update status badges",
-      });
+      try {
+        await octokit.rest.pulls.create({
+          ...context.repo,
+          head,
+          base,
+          title: "Update status badges",
+          maintainer_can_modify: true,
+        });
+      } catch (err) {
+        if (err.status === 422) {
+          core.warning(
+            `Validation error creating new PR (existing PRs will be force pushed to): ${err.message}`
+          );
+        } else {
+          throw err;
+        }
+      }
     } else {
       core.debug("Updating file locally & committing to the main branch");
       await fs.writeFile(path, updatedContent);
