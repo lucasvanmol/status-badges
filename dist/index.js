@@ -10264,6 +10264,8 @@ var __webpack_exports__ = {};
 var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(7147);
 ;// CONCATENATED MODULE: ./node_modules/string-replace-async/index.js
 function replaceAsync(string, searchValue, replacer) {
   try {
@@ -10291,9 +10293,10 @@ function replaceAsync(string, searchValue, replacer) {
   }
 }
 
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(7147);
 ;// CONCATENATED MODULE: ./modules/mod.js
+
+
+
 /**
  * Get the last commit date of a given repo
  * @param   {octokit} octokit   An authenticated Github Octokit client https://github.com/octokit/octokit.js
@@ -10302,12 +10305,14 @@ var external_fs_ = __nccwpck_require__(7147);
  * @returns {Date}              The date of the last commit
  */
 async function getLastCommitDate(octokit, owner, repo) {
-    const req = await octokit.request('GET /repos/{owner}/{repo}/commits', {
-        owner,
-        repo,
-        per_page: 1,
-    });
-    return new Date(req.data[0].commit.committer.date);
+  const req = await octokit.request("GET /repos/{owner}/{repo}/commits", {
+    owner,
+    repo,
+    per_page: 1,
+  });
+  console.log(req);
+  console.log(req.data);
+  return new Date(req.data[0].commit.committer.date);
 }
 
 /**
@@ -10317,33 +10322,133 @@ async function getLastCommitDate(octokit, owner, repo) {
  * @param   {string}    parameterName   The name of the parameter, for debug logging
  * @returns {Date}                      The originDate minus the duration specified by durationString
  */
-function subtractDurationFromDate(originDate, durationString, parameterName = undefined) {
-    const regex = /^(\d+) (day|week|month|year)s?$/;
-    const newDate = new Date(originDate.getTime());
+function subtractDurationFromDate(
+  originDate,
+  durationString,
+  parameterName = undefined
+) {
+  const regex = /^(\d+) (day|week|month|year)s?$/;
+  const newDate = new Date(originDate.getTime());
 
-    let match = durationString.match(regex);
-    if (!match) {
-        throw Error(`${parameterName ? `The parameter ${parameterName}, which was set to ` : ""}'${durationString}' should match ${regex}`)
-    } else {
-        switch (match[2]) {
-            case 'day':
-                newDate.setDate(newDate.getDate() - match[1]);
-                break;
-            case 'week':
-                newDate.setDate(newDate.getDate() - match[1] * 7);
-                break;
-            case 'month':
-                newDate.setMonth(newDate.getMonth() - match[1]);
-                break;
-            case 'year':
-                newDate.setFullYear(newDate.getFullYear() - match[1]);
-                break;
-            default:
-                // unreachable
-                throw Error(`Unexpected error parsing regex`);
-        }
+  let match = durationString.match(regex);
+  if (!match) {
+    throw Error(
+      `${
+        parameterName ? `The parameter ${parameterName}, which was set to ` : ""
+      }'${durationString}' should match ${regex}`
+    );
+  } else {
+    switch (match[2]) {
+      case "day":
+        newDate.setDate(newDate.getDate() - match[1]);
+        break;
+      case "week":
+        newDate.setDate(newDate.getDate() - match[1] * 7);
+        break;
+      case "month":
+        newDate.setMonth(newDate.getMonth() - match[1]);
+        break;
+      case "year":
+        newDate.setFullYear(newDate.getFullYear() - match[1]);
+        break;
+      default:
+        // unreachable
+        throw Error(`Unexpected error parsing regex`);
     }
-    return newDate;
+  }
+  return newDate;
+}
+
+/**
+ * Finds all github links in a text, and places/updates badges next to ones that have `<!-- STATUS_BADGE -->` next to them
+ * @param   {octokit}   octokit     An authenticated Github Octokit client
+ * @param   {string}    text        The text to parse and update
+ * @param   {*}         config      Configuration for emojis and dates to use
+ * @param   {bool}      findAll     If true, every github link will get a badge placed, regardless of `<!-- STATUS_BADGE -->` being present, UNLESS `<!-- NO_STATUS_BADGE -->` is present
+ * @returns {string}                The text with updated badges
+ */
+async function findAndPlaceBadges(
+  octokit,
+  text,
+  config,
+  findAll = false
+) {
+  // Example matches:
+  //                      owner   repo     emoji
+  //                        |      |         |
+  //                    --------- ---- --------------
+  // https://github.com/rust-lang/rust :green_circle: <!-- STATUS_BADGE -->
+  // ---------------------------------
+  //                 |
+  //                baseUrl
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH
+  //
+  //
+  //                             owner   repo
+  //                               |      |
+  //                           --------- ----
+  // [Repo](https://github.com/rust-lang/rust/blob/master/README.md#quick-start) <!-- STATUS_BADGE -->
+  //        ---------------------------------
+  //                        |                ----------------------------------- tail
+  //                      baseUrl
+  //        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH
+  //
+  const badgeRegex =
+    /(?<baseUrl>https?:\/\/github\.com\/(?<owner>[\w,\-,\.]+)\/(?<repo>[\w,\-,\.]+))(?<tail>(?:[\/,#][\w,\-,\.,\/,\#]*)?\)?)? *(?<emoji>\:\w+\:)? *(?=<!\-\- *STATUS_BADGE *\-\->)/g;
+
+  //                      owner   repo                                            badge
+  //                        |      |                                                |
+  //                    --------- ----                                   ------------------------
+  // https://github.com/rust-lang/rust/blob/master/README.md#quick-start <!-- NO_STATUS_BADGE -->
+  // ---------------------------------
+  //                 |                ---------------------------------- tail
+  //                url
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH
+  //
+  const findAllRegex =
+    /(?<baseUrl>https?:\/\/github\.com\/(?<owner>[\w,\-,\.]+)\/(?<repo>[\w,\-,\.]+))(?<tail>(?:[\/,#][\w,\-,\.,\/,\#]*)?\)?)? *(?<emoji>\:\w+\:)? *(?<badge><!\-\- *NO_STATUS_BADGE *\-\->)?/g;
+
+  let regex;
+  if (findAll) {
+    regex = findAllRegex;
+  } else {
+    regex = badgeRegex;
+  }
+
+  const updatedContent = await replaceAsync(
+    text,
+    regex,
+    async (match, baseUrl, owner, repo, tail, _emoji, badge) => {
+      // Don't replace anything with matches that have the `<-- NO_STATUS_BADGE -->` tag in findAll mode
+      if (badge && findAll) {
+        core.debug(`Ignoring match: "${match}"`);
+        return match;
+      }
+
+      let emoji = config.notFoundEmoji;
+      try {
+        const lastCommitDate = await getLastCommitDate(octokit, owner, repo);
+
+        // Determine status
+        if (lastCommitDate < config.inactiveDate) {
+          emoji = config.inactiveEmoji;
+        } else if (lastCommitDate < config.staleDate) {
+          emoji = config.staleEmoji;
+        } else {
+          emoji = config.activeEmoji;
+        }
+      } catch (err) {
+        core.warning(
+          `Error getting last commit date for repo https://github.com/${owner}/${repo}: ${err}`
+        );
+      }
+
+      core.debug(`Found repo: ${baseUrl}, setting status to ${emoji}`);
+      return `${baseUrl}${tail ? `${tail}` : ""} ${emoji} `;
+    }
+  );
+
+  return updatedContent;
 }
 
 // EXTERNAL MODULE: ./node_modules/@kwsites/file-exists/dist/index.js
@@ -14223,145 +14328,100 @@ var esm_default = (/* unused pure expression or super */ null && (gitInstanceFac
 
 
 
-
 const main = async () => {
-    const myToken = core.getInput('token');
-    const octokit = github.getOctokit(myToken);
-    const context = github.context;
+  const myToken = core.getInput("token");
+  const octokit = github.getOctokit(myToken);
+  const context = github.context;
 
-    const path = core.getInput('path');
-    const content = await external_fs_.promises.readFile(path, 'utf8');
-    
-    const staleDateInput = core.getInput('stale-timeout');
-    const inactiveDateInput = core.getInput('inactive-timeout');
+  const path = core.getInput("path");
+  const content = await external_fs_.promises.readFile(path, "utf8");
 
-    const dateNow = new Date();
-    const staleDate = subtractDurationFromDate(dateNow, staleDateInput, 'stale-timeout');
-    const inactiveDate = subtractDurationFromDate(dateNow, inactiveDateInput, 'inactive-timeout');
+  const staleDateInput = core.getInput("stale-timeout");
+  const inactiveDateInput = core.getInput("inactive-timeout");
 
-    const notFoundEmoji = core.getInput('not-found-emoji');
-    const inactiveEmoji = core.getInput('inactive-emoji');
-    const staleEmoji = core.getInput('stale-emoji');
-    const activeEmoji = core.getInput('active-emoji');
+  const dateNow = new Date();
+  const staleDate = subtractDurationFromDate(
+    dateNow,
+    staleDateInput,
+    "stale-timeout"
+  );
+  const inactiveDate = subtractDurationFromDate(
+    dateNow,
+    inactiveDateInput,
+    "inactive-timeout"
+  );
 
-    // Example matches:
-    //                      owner   repo     emoji
-    //                        |      |         |
-    //                    --------- ---- --------------
-    // https://github.com/rust-lang/rust :green_circle: <!-- STATUS_BADGE -->
-    // --------------------------------- 
-    //                 |
-    //                baseUrl
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH
-    //
-    //
-    //                             owner   repo
-    //                               |      |
-    //                           --------- ----
-    // [Repo](https://github.com/rust-lang/rust/blob/master/README.md#quick-start) <!-- STATUS_BADGE -->
-    //        ---------------------------------
-    //                        |                ----------------------------------- tail
-    //                      baseUrl
-    //        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH
-    //
-    const badgeRegex   = /(?<baseUrl>https?:\/\/github\.com\/(?<owner>[\w,\-,\.]+)\/(?<repo>[\w,\-,\.]+))(?<tail>(?:[\/,#][\w,\-,\.,\/,\#]*)?\)?)? *(?<emoji>\:\w+\:)? *(?=<!\-\- *STATUS_BADGE *\-\->)/g;
-    
-    //                      owner   repo                                            badge
-    //                        |      |                                                |
-    //                    --------- ----                                   ------------------------
-    // https://github.com/rust-lang/rust/blob/master/README.md#quick-start <!-- NO_STATUS_BADGE -->
-    // ---------------------------------
-    //                 |                ---------------------------------- tail
-    //                url
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH 
-    //
-    const findAllRegex = /(?<baseUrl>https?:\/\/github\.com\/(?<owner>[\w,\-,\.]+)\/(?<repo>[\w,\-,\.]+))(?<tail>(?:[\/,#][\w,\-,\.,\/,\#]*)?\)?)? *(?<emoji>\:\w+\:)? *(?<badge><!\-\- *NO_STATUS_BADGE *\-\->)?/g;
+  const notFoundEmoji = core.getInput("not-found-emoji");
+  const inactiveEmoji = core.getInput("inactive-emoji");
+  const staleEmoji = core.getInput("stale-emoji");
+  const activeEmoji = core.getInput("active-emoji");
 
-    let regex;
-    const findAllLinks = core.getInput('find-all-links');
-    if (findAllLinks === 'true') {
-        regex = findAllRegex;
-    } else if (findAllLinks === 'false') {
-        regex = badgeRegex;
+  const config = {
+    staleDate: staleDate,
+    inactiveDate: inactiveDate,
+    notFoundEmoji: notFoundEmoji,
+    inactiveEmoji: inactiveEmoji,
+    staleEmoji: staleEmoji,
+    activeEmoji: activeEmoji,
+  };
+
+  const findAllLinksInput = core.getInput("find-all-links");
+  if (findAllLinksInput !== "true" && findAllLinksInput !== "false") {
+    throw Error("Parameter `find-all-links` must set to `true` or `false`");
+  }
+  const findAll = findAllLinksInput === "true";
+
+  const updatedContent = findAndPlaceBadges(octokit, content, config, findAll);
+
+  core.debug("\n---- OLD TEXT ----\n");
+  core.debug(content);
+  core.debug("\n---- NEW TEXT ----\n");
+  core.debug(updatedContent);
+
+  const doPullRequest = core.getInput("pull-request") === "true";
+
+  if (content !== updatedContent) {
+    // Setup git
+    const git = simpleGit();
+    git
+      .addConfig("user.name", "github-actions[bot]")
+      .addConfig("user.email", "github-actions[bot]@users.noreply.github.com");
+
+    const base = (await git.branchLocal()).current;
+
+    if (doPullRequest) {
+      // Push to user-specified branch
+      const head = core.getInput("pr-branch");
+      await git.fetch();
+      await git.checkout(head);
+
+      // Update the file content locally & commit to pr-branch
+      await git.reset("hard", `origin/${base}`); //UNTESTED HALP
+      await external_fs_.promises.writeFile(path, updatedContent);
+      git.commit("Update status badges", path);
+      await git.push("origin", head);
+
+      // https://github.com/lucasvanmol/status-badges/pull/4/files
+      await octokit.rest.pulls.create({
+        ...context.repo,
+        head,
+        base,
+        title: "Update status badges",
+      });
     } else {
-        throw Error("Parameter `find-all-links` must set to `true` or `false`")
+      // Update the file content locally & commit directly to main branch
+      await external_fs_.promises.writeFile(path, updatedContent);
+      git.commit("Update status badges", path);
+
+      await git.pull(undefined, undefined, ["--rebase"]);
+      await git.push("origin", base);
     }
+  } else {
+    core.info("All badges were found to be up-to-date");
+  }
+};
 
-    const updatedContent = await replaceAsync(content, regex, async (match, baseUrl, owner, repo, tail, _emoji, badge) => {
-        // Don't replace anything with matches that have the `<-- NO_STATUS_BADGE -->` tag in findAll mode
-        if (badge && findAllLinks === 'true') {
-            core.debug(`Ignoring match: "${match}"`);
-            return match
-        }
-
-        let emoji = notFoundEmoji;
-        try {
-            const lastCommitDate = await getLastCommitDate(octokit, owner, repo);
-            
-            // Determine status
-            if (lastCommitDate < inactiveDate) {
-                emoji = inactiveEmoji;
-            } else if (lastCommitDate < staleDate) {
-                emoji = staleEmoji;
-            } else {
-                emoji = activeEmoji;
-            }
-        } catch(err) {
-            core.warning(`Error getting last commit date for repo https://github.com/${owner}/${repo}: ${err}`);
-        }
-
-        core.debug(`Found repo: ${baseUrl}, setting status to ${emoji}`)
-        return `${baseUrl}${tail ? `${tail}` : ""} ${emoji} `;
-    });
-
-    core.debug("\n---- OLD TEXT ----\n");
-    core.debug(content);
-    core.debug("\n---- NEW TEXT ----\n");
-    core.debug(updatedContent);
-
-    const doPullRequest = core.getInput('pull-request') === 'true';
-
-    if (content !== updatedContent) {        
-        // Setup git
-        const git = simpleGit()
-        git.addConfig('user.name', 'github-actions[bot]')
-            .addConfig('user.email', 'github-actions[bot]@users.noreply.github.com');
-        
-        const base = (await git.branchLocal()).current;
-
-        if (doPullRequest) {
-            // Push to user-specified branch
-            const head = core.getInput('pr-branch');
-            await git.fetch();
-            await git.checkout(head)
-
-            // Update the file content locally & commit to pr-branch
-            await git.reset('hard', `origin/${base}`); //UNTESTED HALP
-            await external_fs_.promises.writeFile(path, updatedContent);
-            git.commit("Update status badges", path);
-            await git.push('origin', head);
-
-            // https://github.com/lucasvanmol/status-badges/pull/4/files
-            await octokit.rest.pulls.create({
-                ...context.repo,
-                head,
-                base,
-                title: "Update status badges"
-            });
-        } else {
-            // Update the file content locally & commit directly to main branch
-            await external_fs_.promises.writeFile(path, updatedContent);
-            git.commit("Update status badges", path);
-
-            await git.pull(undefined, undefined, ['--rebase']);
-            await git.push('origin', base);
-        }
-    } else {
-        core.info("All badges were found to be up-to-date");
-    }
-}
-
-main().catch(err => core.setFailed(err.message));
+main().catch((err) => core.setFailed(err.message));
 
 })();
 
