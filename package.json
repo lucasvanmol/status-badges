@@ -8,7 +8,7 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "build": "ncc build index.js --license licenses.txt",
     "lint": "prettier --write .",
-    "check-lint": "prettier --check ."
+    "lint-check": "prettier --check ."
   },
   "jest": {
     "globalSetup": "<rootDir>/modules/setup-jest.js"
