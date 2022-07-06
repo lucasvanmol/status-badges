@@ -14369,7 +14369,7 @@ const main = async () => {
   }
   const findAll = findAllLinksInput === "true";
 
-  const updatedContent = findAndPlaceBadges(octokit, content, config, findAll);
+  const updatedContent = await findAndPlaceBadges(octokit, content, config, findAll);
 
   core.debug("\n---- OLD TEXT ----\n");
   core.debug(content);
@@ -14381,7 +14381,7 @@ const main = async () => {
   if (content !== updatedContent) {
     // Setup git
     const git = simpleGit();
-    git
+    await git
       .addConfig("user.name", "github-actions[bot]")
       .addConfig("user.email", "github-actions[bot]@users.noreply.github.com");
 
@@ -14390,13 +14390,12 @@ const main = async () => {
     if (doPullRequest) {
       // Push to user-specified branch
       const head = core.getInput("pr-branch");
-      git.branch(head);
-      git.checkout(head);
+      await git.branch(head);
+      await git.checkout(head);
 
       // Update the file content locally & commit to pr-branch
-      await git.reset("hard", `origin/${base}`); //UNTESTED HALP
       await external_fs_.promises.writeFile(path, updatedContent);
-      git.commit("Update status badges", path);
+      await git.commit("Update status badges", path);
       await git.push("origin", head, ["--set-upstream"]);
 
       // https://github.com/lucasvanmol/status-badges/pull/4/files
@@ -14409,7 +14408,7 @@ const main = async () => {
     } else {
       // Update the file content locally & commit directly to main branch
       await external_fs_.promises.writeFile(path, updatedContent);
-      git.commit("Update status badges", path);
+      await git.commit("Update status badges", path);
 
       await git.pull(undefined, undefined, ["--rebase"]);
       await git.push("origin", base);
