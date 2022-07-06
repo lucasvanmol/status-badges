@@ -1,5 +1,9 @@
 import github from "@actions/github";
-import { getLastCommitDate, subtractDurationFromDate, findAndPlaceBadges } from "./mod";
+import {
+  getLastCommitDate,
+  subtractDurationFromDate,
+  findAndPlaceBadges,
+} from "./mod";
 
 const octokit = github.getOctokit("TOKEN");
 const oneMonthAgo = new Date();
@@ -7,7 +11,7 @@ oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 const threeMonthsAgo = new Date();
 threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
-describe("getLastCommitDate", () => {  
+describe("getLastCommitDate", () => {
   test("active repo is detected", async () => {
     const owner = "test-owner";
     const repo = "active-repo";
@@ -66,36 +70,46 @@ describe("findAndPlaceBadges", () => {
   };
 
   test("works for hyperlinks", async () => {
-    const text = "[Active link](https://github.com/test-owner/active-repo) <!--STATUS_BADGE-->";
-    const textWithBadges = "[Active link](https://github.com/test-owner/active-repo) :green_circle: <!--STATUS_BADGE-->";
+    const text =
+      "[Active link](https://github.com/test-owner/active-repo) <!--STATUS_BADGE-->";
+    const textWithBadges =
+      "[Active link](https://github.com/test-owner/active-repo) :green_circle: <!--STATUS_BADGE-->";
     const updatedText = await findAndPlaceBadges(octokit, text, config, false);
     expect(updatedText).toEqual(textWithBadges);
   });
 
   test("works for direct links", async () => {
-    const text = "This repo is inactive: https://github.com/test-owner/inactive-repo <!--STATUS_BADGE-->";
-    const textWithBadges = "This repo is inactive: https://github.com/test-owner/inactive-repo :red_circle: <!--STATUS_BADGE-->";
+    const text =
+      "This repo is inactive: https://github.com/test-owner/inactive-repo <!--STATUS_BADGE-->";
+    const textWithBadges =
+      "This repo is inactive: https://github.com/test-owner/inactive-repo :red_circle: <!--STATUS_BADGE-->";
     const updatedText = await findAndPlaceBadges(octokit, text, config, false);
     expect(updatedText).toEqual(textWithBadges);
   });
 
   test("can use findAll option", async () => {
-    const text = "https://github.com/test-owner/inactive-repo <!--STATUS_BADGE-->, [repo 1](https://github.com/test-owner/inactive-repo), [repo 2](https://github.com/test-owner/active-repo) <!--NO_STATUS_BADGE-->, https://github.com/test-owner/active-repo , [repo 2](https://github.com/test-owner/stale-repo)!";
-    const textWithBadges = "https://github.com/test-owner/inactive-repo :red_circle: <!--STATUS_BADGE-->, [repo 1](https://github.com/test-owner/inactive-repo) :red_circle: , [repo 2](https://github.com/test-owner/active-repo) <!--NO_STATUS_BADGE-->, https://github.com/test-owner/active-repo :green_circle: , [repo 2](https://github.com/test-owner/stale-repo) :yellow_circle: !";
+    const text =
+      "https://github.com/test-owner/inactive-repo <!--STATUS_BADGE-->, [repo 1](https://github.com/test-owner/inactive-repo), [repo 2](https://github.com/test-owner/active-repo) <!--NO_STATUS_BADGE-->, https://github.com/test-owner/active-repo , [repo 2](https://github.com/test-owner/stale-repo)!";
+    const textWithBadges =
+      "https://github.com/test-owner/inactive-repo :red_circle: <!--STATUS_BADGE-->, [repo 1](https://github.com/test-owner/inactive-repo) :red_circle: , [repo 2](https://github.com/test-owner/active-repo) <!--NO_STATUS_BADGE-->, https://github.com/test-owner/active-repo :green_circle: , [repo 2](https://github.com/test-owner/stale-repo) :yellow_circle: !";
     const updatedText = await findAndPlaceBadges(octokit, text, config, true);
     expect(updatedText).toEqual(textWithBadges);
   });
 
   test("can replace badges", async () => {
-    const text = "https://github.com/test-owner/inactive-repo :green_circle: <!--STATUS_BADGE-->";
-    const textWithBadges = "https://github.com/test-owner/inactive-repo :red_circle: <!--STATUS_BADGE-->";
+    const text =
+      "https://github.com/test-owner/inactive-repo :green_circle: <!--STATUS_BADGE-->";
+    const textWithBadges =
+      "https://github.com/test-owner/inactive-repo :red_circle: <!--STATUS_BADGE-->";
     const updatedText = await findAndPlaceBadges(octokit, text, config, false);
     expect(updatedText).toEqual(textWithBadges);
   });
 
   test("can handle 404s", async () => {
-    const text = "https://github.com/test-owner/unexistant-repo <!--STATUS_BADGE-->";
-    const textWithBadges = "https://github.com/test-owner/unexistant-repo :grey_question: <!--STATUS_BADGE-->";
+    const text =
+      "https://github.com/test-owner/unexistant-repo <!--STATUS_BADGE-->";
+    const textWithBadges =
+      "https://github.com/test-owner/unexistant-repo :grey_question: <!--STATUS_BADGE-->";
     const updatedText = await findAndPlaceBadges(octokit, text, config, false);
     expect(updatedText).toEqual(textWithBadges);
   });

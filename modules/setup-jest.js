@@ -102,7 +102,7 @@ export default function setup(globalConfig, projectConfig) {
     ])
     .persist();
 
-    const oneDayAgo = new Date();
+  const oneDayAgo = new Date();
   oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
   nock("https://api.github.com")

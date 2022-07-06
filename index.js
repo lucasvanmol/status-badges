@@ -47,12 +47,12 @@ const main = async () => {
   }
   const findAll = findAllLinksInput === "true";
 
-  const updatedContent = await findAndPlaceBadges(octokit, content, config, findAll);
-
-  core.debug("\n---- OLD TEXT ----\n");
-  core.debug(content);
-  core.debug("\n---- NEW TEXT ----\n");
-  core.debug(updatedContent);
+  const updatedContent = await findAndPlaceBadges(
+    octokit,
+    content,
+    config,
+    findAll
+  );
 
   const doPullRequest = core.getInput("pull-request") === "true";
 
@@ -68,15 +68,17 @@ const main = async () => {
     if (doPullRequest) {
       // Push to user-specified branch
       const head = core.getInput("pr-branch");
-      await git.branch(head);
-      await git.checkout(head);
+      core.debug(`Creating new branch "${head}"`);
+      await git.branch(head).checkout(head);
 
-      // Update the file content locally & commit to pr-branch
+      core.debug(`Updating file locally & committing`);
       await fs.writeFile(path, updatedContent);
       await git.commit("Update status badges", path);
-      await git.push(["--set-upstream", "origin", head]);
 
-      // https://github.com/lucasvanmol/status-badges/pull/4/files
+      core.debug(`Running "git push --set-upstream origin ${head}"`);
+      await git.raw(`push --set-upstream origin ${head}`);
+
+      core.debug(`Creating pull request`);
       await octokit.rest.pulls.create({
         ...context.repo,
         head,
@@ -86,10 +88,10 @@ const main = async () => {
     } else {
       // Update the file content locally & commit directly to main branch
       await fs.writeFile(path, updatedContent);
-      await git.commit("Update status badges", path);
-
-      await git.pull(undefined, undefined, ["--rebase"]);
-      await git.push("origin", base);
+      await git
+        .commit("Update status badges", path)
+        .pull(undefined, undefined, ["--rebase"])
+        .push("origin", base);
     }
   } else {
     core.info("All badges were found to be up-to-date");
