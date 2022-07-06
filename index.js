@@ -74,7 +74,7 @@ const main = async () => {
       // Update the file content locally & commit to pr-branch
       await fs.writeFile(path, updatedContent);
       await git.commit("Update status badges", path);
-      await git.push("origin", head, ["--set-upstream"]);
+      await git.push(["--set-upstream", "origin", head]);
 
       // https://github.com/lucasvanmol/status-badges/pull/4/files
       await octokit.rest.pulls.create({
