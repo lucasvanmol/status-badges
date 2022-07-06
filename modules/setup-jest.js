@@ -151,8 +151,8 @@ export default function setup(globalConfig, projectConfig) {
       },
     ])
     .persist();
-  
-    nock("https://api.github.com")
+
+  nock("https://api.github.com")
     .get("/repos/test-owner/unexistant-repo/commits")
     .query(params)
     .reply(404)
@@ -174,5 +174,6 @@ export default function setup(globalConfig, projectConfig) {
         "x-ratelimit-remaining": 0,
         "x-ratelimit-reset": 1372700873,
       }
-    ).persist();
+    )
+    .persist();
 }

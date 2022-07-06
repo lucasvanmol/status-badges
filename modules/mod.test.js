@@ -117,6 +117,8 @@ describe("findAndPlaceBadges", () => {
   test("can handle rate limiting", async () => {
     const text =
       "https://github.com/test-owner/ratelimit-repo <!--STATUS_BADGE-->";
-    await expect(findAndPlaceBadges(octokit, text, config, false)).rejects.toThrow("Rate limit error:");
+    await expect(
+      findAndPlaceBadges(octokit, text, config, false)
+    ).rejects.toThrow("Rate limit error:");
   });
 });
