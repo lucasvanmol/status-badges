@@ -14390,14 +14390,14 @@ const main = async () => {
     if (doPullRequest) {
       // Push to user-specified branch
       const head = core.getInput("pr-branch");
-      await git.fetch();
-      await git.checkout(head);
+      git.branch(head);
+      git.checkout(head);
 
       // Update the file content locally & commit to pr-branch
       await git.reset("hard", `origin/${base}`); //UNTESTED HALP
       await external_fs_.promises.writeFile(path, updatedContent);
       git.commit("Update status badges", path);
-      await git.push("origin", head);
+      await git.push("origin", head, ["--set-upstream"]);
 
       // https://github.com/lucasvanmol/status-badges/pull/4/files
       await octokit.rest.pulls.create({
