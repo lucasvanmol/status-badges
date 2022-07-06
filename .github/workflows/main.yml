@@ -2,9 +2,6 @@ name: Update Status Badges
 on:
   schedule:
     - cron: "0 0 * * *"
-  push:
-    paths:
-      - "README.md"
   workflow_dispatch:
 
 jobs:
@@ -21,4 +18,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           stale-timeout: "1 week"
           pull-request: true
-          pr-branch: test-branch

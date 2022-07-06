@@ -67,7 +67,7 @@ const main = async () => {
 
     if (doPullRequest) {
       // Push to user-specified branch
-      const head = core.getInput("pr-branch");
+      const head = core.getInput("pr-branch", { required: true });
       core.debug(`Creating new branch "${head}"`);
       await git.branch([head]).checkout(head);
 

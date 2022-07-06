@@ -44,7 +44,7 @@ inputs:
     required: true
   pr-branch:
     description: "If pull-request is true, this specifies which branch should be the head"
-    default: ""
+    default: "status-badges:update"
     required: false
 runs:
   using: "node16"
