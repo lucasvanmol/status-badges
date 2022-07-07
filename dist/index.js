@@ -10443,7 +10443,7 @@ async function findAndPlaceBadges(
           );
         } else if (err.status === 403 && err.message.includes("rate limit")) {
           const ratelimitRestSeconds = parseInt(
-            err.request.headers["x-ratelimit-reset"]
+            err.response.headers["x-ratelimit-reset"]
           );
           const ratelimitReset = new Date(ratelimitRestSeconds * 1000);
           throw Error(
