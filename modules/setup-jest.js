@@ -53,7 +53,7 @@ export default function setup(globalConfig, projectConfig) {
     .persist();
 
   const twoMonthsAgo = new Date();
-  twoMonthsAgo.setMonth(twoMonthsAgo.getDate() - 2);
+  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
 
   nock("https://api.github.com")
     .get("/repos/test-owner/stale-repo/commits")

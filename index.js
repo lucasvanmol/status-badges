@@ -63,7 +63,10 @@ const main = async () => {
       .addConfig("user.name", "github-actions[bot]")
       .addConfig("user.email", "github-actions[bot]@users.noreply.github.com");
 
-    const base = (await git.branchLocal()).current;
+    const branches = await git.branchLocal();
+    const base = branches.current;
+    core.debug(`Git initialized locally, found branches: ${branches}`);
+    core.debug(`Using base branch: ${base}`);
 
     if (doPullRequest) {
       // Push to user-specified branch
@@ -78,15 +81,16 @@ const main = async () => {
       core.debug(`Running "git push --set-upstream origin ${head}"`);
       await git.push(["-f", "--set-upstream", "origin", `${head}`]);
 
-      core.debug(`Creating pull request`);
+      const pullRequest = {
+        ...context.repo,
+        head,
+        base,
+        title: "Update status badges",
+        maintainer_can_modify: true,
+      };
+      core.debug(`Creating pull request: ${pullRequest}`);
       try {
-        await octokit.rest.pulls.create({
-          ...context.repo,
-          head,
-          base,
-          title: "Update status badges",
-          maintainer_can_modify: true,
-        });
+        await octokit.rest.pulls.create(pullRequest);
       } catch (err) {
         if (err.status === 422) {
           core.warning(

@@ -158,8 +158,8 @@ export async function findAndPlaceBadges(
         }
       }
 
-      core.debug(`Found repo: ${baseUrl}, setting status to ${emoji}`);
-      return `${baseUrl}${tail ? `${tail}` : ""} ${emoji}`;
+      core.debug(`Found repo link: ${baseUrl}, setting status to ${emoji}`);
+      return `${baseUrl}${tail ? tail : ""} ${emoji}`;
     }
   );
 
