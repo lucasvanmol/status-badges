@@ -14400,7 +14400,9 @@ const main = async () => {
 
     const branches = await git.branchLocal();
     const base = branches.current;
-    core.debug(`Git initialized locally, found branches: ${branches}`);
+    core.debug(
+      `Git initialized locally, found branches: ${JSON.stringify(branches)}`
+    );
     core.debug(`Using base branch: ${base}`);
 
     if (doPullRequest) {
@@ -14423,7 +14425,7 @@ const main = async () => {
         title: "Update status badges",
         maintainer_can_modify: true,
       };
-      core.debug(`Creating pull request: ${pullRequest}`);
+      core.debug(`Creating pull request: ${JSON.stringify(pullRequest)}`);
       try {
         await octokit.rest.pulls.create(pullRequest);
       } catch (err) {
