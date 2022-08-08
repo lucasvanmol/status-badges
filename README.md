@@ -57,7 +57,7 @@ Certain inputs are optional arguments to customize emojis to use and determine f
 
 | Input              | Description                                                                                                         | Default                |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| `find-all-links`   | If `true`, set badges next to every repo link in the file, regardless of `<!-- STATUS_BADGE -->` being present'     | `false`                |
+| `find-all-links`   | If `true`, sets badges next to every repo link in the file, regardless of `<!-- STATUS_BADGE -->` being present. In addition, any link with `<!-- NO_STATUS_BADGE -->` next to it won't be affected.     | `false`                |
 | `pull-request`     | If `true`, a pull request will be made instead of directly committing to branch.                                    | `false`                |
 | `pr-branch`        | Specify what branch name to use for the pull request head if `pull-request` is `true`                               | `status-badges/update` |
 | `stale-timeout`    | The amount of time required before a repo is marked as stale. Must match `/^(\d+) (day\|week\|month\|year)s?$/`.    | `1 month`              |
@@ -75,6 +75,6 @@ Certain inputs are optional arguments to customize emojis to use and determine f
 | `[Inactive Repo](https://github.com/lucasvanmol/barnes-hut-benc​h) <!-- STATUS_BADGE -->`                | [Inactive Repo](https://github.com/lucasvanmol/barnes-hut-bench) :red_circle: <!-- STATUS_BADGE -->                               |
 | `https://github.com/lucasvanmol/this-repo-does-not-exis​t <!-- STATUS_BADGE -->`                         | https://github.com/lucasvanmol/this-repo-does-not-exist :grey_question: <!-- STATUS_BADGE -->                                        |
 | `[Rust's test directory](h​ttps://github.com/rust-lang/rust/tree/master/src/test) <!-- STATUS_BADGE -->` | [Rust's test directory](https://github.com/rust-lang/rust/tree/master/src/test) :green_circle: <!-- STATUS_BADGE --> |
-| h​ttps://github.com/rust-lang/rust#building-on-windows <!-- STATUS_BADGE -->                             | https://github.com/rust-lang/rust#building-on-windows :green_circle: <!-- STATUS_BADGE -->                             |
+| `h​ttps://github.com/rust-lang/rust#building-on-windows <!-- STATUS_BADGE -->`                             | https://github.com/rust-lang/rust#building-on-windows :green_circle: <!-- STATUS_BADGE -->                             |
 
 Note that only the main branch is checked for commits. For links to subdirectories, only the base directory is checked.
