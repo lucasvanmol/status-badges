@@ -78,3 +78,19 @@ Certain inputs are optional arguments to customize emojis to use and determine f
 | `h​ttps://github.com/rust-lang/rust#building-on-windows <!-- STATUS_BADGE -->`                             | https://github.com/rust-lang/rust#building-on-windows :green_circle: <!-- STATUS_BADGE -->                             |
 
 Note that only the main branch is checked for commits. For links to subdirectories, only the base directory is checked.
+
+## Development
+
+In order to contribute to the development of this action, the following commands need to run (& pass) on every PR:
+
+```
+npm run test
+```
+
+```
+npm run build
+```
+
+```
+npm run lint
+```
