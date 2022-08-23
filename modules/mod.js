@@ -75,6 +75,13 @@ export async function findAndPlaceBadges(
   config,
   findAll = false
 ) {
+  const emojis = [
+    config.activeEmoji,
+    config.staleEmoji,
+    config.inactiveEmoji,
+    config.notFoundEmoji,
+  ];
+
   // Example matches:
   //                      owner   repo     emoji
   //                        |      |         |
@@ -95,8 +102,11 @@ export async function findAndPlaceBadges(
   //                      baseUrl
   //        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH
   //
-  const badgeRegex =
-    /(?<baseUrl>https?:\/\/github\.com\/(?<owner>[\w,\-,\.]+)\/(?<repo>[\w,\-,\.]+))(?<tail>(?:[\/,#][\w,\-,\.,\/,\#]*)?\)?)? *(?<emoji>\:\w+\:)? *(?=<!\-\- *STATUS_BADGE *\-\->)/g;
+  // prettier-ignore
+  const badgeRegex = new RegExp(
+    `(?<baseUrl>https?:\\/\\/github\\.com\\/(?<owner>[\\w,\\-,\\.]+)\\/(?<repo>[\\w,\\-,\\.]+))(?<tail>(?:[\\/,#][\\w,\\-,\\.,\\/,\\#]*)?\\)?)? *(?<emoji>${emojis.join("|")})? *(?=<!\\-\\- *STATUS_BADGE *\\-\\->)`,
+    "g"
+  );
 
   //                      owner   repo                                            badge
   //                        |      |                                                |
@@ -107,8 +117,11 @@ export async function findAndPlaceBadges(
   //                url
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MATCH
   //
-  const findAllRegex =
-    /(?<baseUrl>https?:\/\/github\.com\/(?<owner>[\w,\-,\.]+)\/(?<repo>[\w,\-,\.]+))(?<tail>(?:[\/,#][\w,\-,\.,\/,\#]*)?\)?)? *(?<emoji>\:\w+\:)? *(?<badge><!\-\- *NO_STATUS_BADGE *\-\->)?/g;
+  // prettier-ignore
+  const findAllRegex = new RegExp(
+    `(?<baseUrl>https?:\\/\\/github\\.com\\/(?<owner>[\\w,\\-,\\.]+)\\/(?<repo>[\\w,\\-,\\.]+))(?<tail>(?:[\\/,#][\\w,\\-,\\.,\\/,\\#]*)?\\)?)? *(?<emoji>${emojis.join("|")})? *(?<badge><!\\-\\- *NO_STATUS_BADGE *\\-\\->)?`,
+    "g"
+  );
 
   let regex;
   if (findAll) {
