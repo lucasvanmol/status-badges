@@ -122,3 +122,38 @@ describe("findAndPlaceBadges", () => {
     ).rejects.toThrow("Rate limit error:");
   });
 });
+
+describe("utf8 Emoji Support", () => {
+  const config = {
+    staleDate: oneMonthAgo,
+    inactiveDate: threeMonthsAgo,
+    notFoundEmoji: "🙈",
+    inactiveEmoji: "🔴",
+    staleEmoji: "🟡",
+    activeEmoji: "🟢",
+  };
+
+  test("can run once", async () => {
+    const text =
+      "[repo 1](https://github.com/test-owner/inactive-repo), [repo 2](https://github.com/test-owner/active-repo), [repo 3](https://github.com/test-owner/stale-repo), https://github.com/test-owner/unexistant-repo";
+    const textWithBadges =
+      "[repo 1](https://github.com/test-owner/inactive-repo) 🔴, [repo 2](https://github.com/test-owner/active-repo) 🟢, [repo 3](https://github.com/test-owner/stale-repo) 🟡, https://github.com/test-owner/unexistant-repo 🙈";
+    const updatedText = await findAndPlaceBadges(octokit, text, config, true);
+    expect(updatedText).toEqual(textWithBadges);
+  });
+
+  test("can run twice", async () => {
+    const text =
+      "[repo 1](https://github.com/test-owner/inactive-repo), [repo 2](https://github.com/test-owner/active-repo), [repo 3](https://github.com/test-owner/stale-repo), https://github.com/test-owner/unexistant-repo";
+    const textWithBadges =
+      "[repo 1](https://github.com/test-owner/inactive-repo) 🔴, [repo 2](https://github.com/test-owner/active-repo) 🟢, [repo 3](https://github.com/test-owner/stale-repo) 🟡, https://github.com/test-owner/unexistant-repo 🙈";
+    const updatedText = await findAndPlaceBadges(octokit, text, config, true);
+    const updatedText2 = await findAndPlaceBadges(
+      octokit,
+      updatedText,
+      config,
+      true
+    );
+    expect(updatedText2).toEqual(textWithBadges);
+  });
+});
