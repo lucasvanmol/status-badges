@@ -6,7 +6,7 @@ Place status badges as emojis next to repo links marked with `<!-- STATUS_BADGE 
 
 | Markdown                                                                        | Result                                                                                      |
 | :------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------ |
-| `See the [rust repo](https://github.com/rust-lang/rus​t) <!-- STATUS_BADGE -->` | See the [rust repo](https://github.com/rust-lang/rust) :green_circle: <!-- STATUS_BADGE --> |
+| `See the [rust repo](https://github.com/rust-lang/rus​t) <!-- STATUS_BADGE -->` | See the [rust repo](https://github.com/rust-lang/rust) :green_circle:<!-- STATUS_BADGE --> |
 
 See [Examples](#examples) for more examples. Be weary of copying the links in the markdown examples, as they contain hidden zero-width spaces in order to not trigger the bot.
 
@@ -71,11 +71,11 @@ Certain inputs are optional arguments to customize emojis to use and determine f
 
 | Markdown                                                                                                 | Result                                                                                                               |
 | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `https://github.com/rust-lang/rus​t <!-- STATUS_BADGE -->`                                               | https://github.com/rust-lang/rust :green_circle: <!-- STATUS_BADGE -->                                                              |
-| `[Inactive Repo](https://github.com/lucasvanmol/barnes-hut-benc​h) <!-- STATUS_BADGE -->`                | [Inactive Repo](https://github.com/lucasvanmol/barnes-hut-bench) :red_circle: <!-- STATUS_BADGE -->                               |
-| `https://github.com/lucasvanmol/this-repo-does-not-exis​t <!-- STATUS_BADGE -->`                         | https://github.com/lucasvanmol/this-repo-does-not-exist :grey_question: <!-- STATUS_BADGE -->                                        |
-| `[Rust's test directory](h​ttps://github.com/rust-lang/rust/tree/master/src/test) <!-- STATUS_BADGE -->` | [Rust's test directory](https://github.com/rust-lang/rust/tree/master/src/test) :green_circle: <!-- STATUS_BADGE --> |
-| `h​ttps://github.com/rust-lang/rust#building-on-windows <!-- STATUS_BADGE -->`                             | https://github.com/rust-lang/rust#building-on-windows :green_circle: <!-- STATUS_BADGE -->                             |
+| `https://github.com/rust-lang/rus​t <!-- STATUS_BADGE -->`                                               | https://github.com/rust-lang/rust :green_circle:<!-- STATUS_BADGE -->                                                              |
+| `[Inactive Repo](https://github.com/lucasvanmol/barnes-hut-benc​h) <!-- STATUS_BADGE -->`                | [Inactive Repo](https://github.com/lucasvanmol/barnes-hut-bench) :red_circle:<!-- STATUS_BADGE -->                               |
+| `https://github.com/lucasvanmol/this-repo-does-not-exis​t <!-- STATUS_BADGE -->`                         | https://github.com/lucasvanmol/this-repo-does-not-exist :grey_question:<!-- STATUS_BADGE -->                                        |
+| `[Rust's test directory](h​ttps://github.com/rust-lang/rust/tree/master/src/test) <!-- STATUS_BADGE -->` | [Rust's test directory](https://github.com/rust-lang/rust/tree/master/src/test) :green_circle:<!-- STATUS_BADGE --> |
+| `h​ttps://github.com/rust-lang/rust#building-on-windows <!-- STATUS_BADGE -->`                             | https://github.com/rust-lang/rust#building-on-windows :green_circle:<!-- STATUS_BADGE -->                             |
 
 Note that only the main branch is checked for commits. For links to subdirectories, only the base directory is checked.
 
